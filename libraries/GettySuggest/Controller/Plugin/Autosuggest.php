@@ -15,6 +15,10 @@ class GettySuggest_Controller_Plugin_Autosuggest extends Zend_Controller_Plugin_
 {
     /**
      * Add autosuggest only during defined routes.
+     *
+     * @param ZendRequest $request Request object corresponding to
+     * a request for the GettySuggestPlugin module
+     * @return void
      */
     public function preDispatch($request)
     {
@@ -59,13 +63,13 @@ class GettySuggest_Controller_Plugin_Autosuggest extends Zend_Controller_Plugin_
                     $view = Zend_Registry::get('view');
                     $view->headScript()->captureStart();
 ?>
-    // Add autosuggest to <?php echo $elementSet->name . ':' . $element->name; ?>. Used by the Getty Suggest plugin.
-    jQuery(document).bind('omeka:elementformload', function(event) {
-        jQuery('#element-<?php echo $element->id; ?> textarea').autocomplete({
-            minLength: 3,
-            source: <?php echo json_encode($view->url('getty-suggest/index/suggest-endpoint-proxy/element-id/' . $element->id)); ?>
-        });
-    });
+                    // Add autosuggest to <?php echo $elementSet->name . ':' . $element->name; ?>. Used by the Getty Suggest plugin.
+                    jQuery(document).bind('omeka:elementformload', function(event) {
+                        jQuery('#element-<?php echo $element->id; ?> textarea').autocomplete({
+                          minLength: 3,
+                                source: <?php echo json_encode($view->url('getty-suggest/index/suggest-endpoint-proxy/element-id/' . $element->id)); ?>
+                        });
+                    });
 <?php
                     $view->headScript()->captureEnd();
                 }

@@ -13,6 +13,10 @@
  */
 class GettySuggestPlugin extends Omeka_Plugin_AbstractPlugin
 {
+
+    /**
+     * @var array Hooks for the plugin.
+     */
     protected $_hooks = array(
         'install', 
         'uninstall', 
@@ -20,12 +24,17 @@ class GettySuggestPlugin extends Omeka_Plugin_AbstractPlugin
         'define_acl', 
     );
     
+    /**
+     * @var array Filters for the plugin.
+     */
     protected $_filters = array(
         'admin_navigation_main', 
     );
     
     /**
      * Install the plugin.
+     *
+     * @return void
      */
     public function hookInstall()
     {
@@ -42,6 +51,8 @@ class GettySuggestPlugin extends Omeka_Plugin_AbstractPlugin
     
     /**
      * Uninstall the plugin.
+     *
+     * @return void
      */
     public function hookUninstall()
     {
@@ -51,6 +62,8 @@ class GettySuggestPlugin extends Omeka_Plugin_AbstractPlugin
     
     /**
      * Initialize the plugin.
+     *
+     * @return void
      */
     public function hookInitialize()
     {
@@ -64,6 +77,10 @@ class GettySuggestPlugin extends Omeka_Plugin_AbstractPlugin
     
     /**
      * Define the plugin's access control list.
+   *
+   * @param array $args This array contains a reference to
+   * the zend ACL under it's 'acl' key.
+   * @return void
      */
     public function hookDefineAcl($args)
     {
@@ -71,7 +88,10 @@ class GettySuggestPlugin extends Omeka_Plugin_AbstractPlugin
     }
     
     /**
-     * Add the LC Suggest page to the admin navigation.
+     * Add the GettySuggest link to the admin main navigation.
+     * 
+     * @param array $nav Array of links for admin nav section
+     * @return array $nav Updated array of links for admin nav section
      */
     public function filterAdminNavigationMain($nav)
     {

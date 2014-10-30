@@ -13,13 +13,26 @@
  */
 class GettySuggest_IndexController extends Omeka_Controller_AbstractActionController
 {
+
+    /**
+     * The default action for this plugin's admin page.
+     *
+     * Sets up form variables which require values from the database.
+     * @return void
+     */
     public function indexAction()
     {
-      $this->view->form_element_options = $this->_getFormElementOptions();
+        $this->view->form_element_options = $this->_getFormElementOptions();
         $this->view->form_suggest_options = $this->_getFormSuggestOptions();
         $this->view->assignments = $this->_getAssignments();
     }
-    
+
+
+     /**
+     * Endpoint for editing a connection between an element and a vocabulary
+     *
+     * @return void
+     */
     public function editElementSuggestAction()
     {
         $elementId = $this->getRequest()->getParam('element_id');
@@ -73,6 +86,8 @@ class GettySuggest_IndexController extends Omeka_Controller_AbstractActionContro
     /**
      * Outputs the suggest endpoint URL of the specified element or NULL if 
      * there is none.
+     *
+     * @return void
      */
     public function suggestEndpointAction()
     {
@@ -85,6 +100,8 @@ class GettySuggest_IndexController extends Omeka_Controller_AbstractActionContro
     /**
      * Proxy for the Getty Suggest suggest endpoints, used by the 
      * autosuggest feature.
+     *
+     * @return void
      */
     public function suggestEndpointProxyAction()
     {
@@ -119,8 +136,8 @@ class GettySuggest_IndexController extends Omeka_Controller_AbstractActionContro
     /**
      * Check if the specified suggest endpoint exists.
      * 
-     * @param string $suggestEndpoint
-     * @return bool
+     * @param string $suggestEndpoint An endpoint url which may or may not exist in the database
+     * @return bool True if the endpoint exists, false otherwise
      */
     private function _suggestEndpointExists($suggestEndpoint)
     {
@@ -185,7 +202,7 @@ class GettySuggest_IndexController extends Omeka_Controller_AbstractActionContro
     }
     
     /**
-     * Get all the authority/vocabulary assignments.
+     * Get all the current authority/vocabulary assignments.
      * 
      * @return array
      */
@@ -208,6 +225,15 @@ class GettySuggest_IndexController extends Omeka_Controller_AbstractActionContro
         return $assignments;
     }
 
+    /**
+     * Create a Sparql query to search the Getty LOD archive for possible 
+     * autocompletions
+     * 
+     * @param string $vocab The name of the vocabulary to query (e.g.
+     * "tgn", or "aat")
+     * @param string $term The first few characters of the term to autosuggest
+     * @return string
+     */
     private function _getSparql($vocab, $term, $language)  {
 return('select ?prefLabel where '.
        '{?concept a gvp:Concept . '.
