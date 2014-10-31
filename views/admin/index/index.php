@@ -15,7 +15,7 @@ jQuery(document).ready(function() {
 //]]>
 </script>
 <?php echo flash(); ?>
-<form method="post" action="<?php echo url('getty-suggest/index/edit-element-suggest'); ?>">
+<form method="post" action="<?php echo url('getty-suggest/suggest/add'); ?>">
 <section class="seven columns alpha">
     <div class="field">
         <div id="element-id-label" class="two columns alpha">
@@ -30,21 +30,21 @@ jQuery(document).ready(function() {
     </div>
     <div class="field">
         <div id="suggest-endpoint-label" class="two columns alpha">
-            <label for="suggest-endpoint"><?php echo __('Authority/Vocabulary'); ?></label>
+            <label for="suggest-endpoint"><?php echo __('Authority/Vocab'); ?></label>
         </div>
         <div class="inputs five columns omega">
             <p class="explanation"><?php echo __('Enter a Getty collection authority/vocabulary ' 
             . 'to enable the autosuggest feature for the above element. To disable ' 
             . 'the feature just deselect the option. For more information about the ' 
             . 'authorities and vocabularies available at the Getty Collection see ' 
-            . '%shttp://id.loc.gov%s', '<a href="http://id.loc.gov" target="_blank">', '</a>'); ?></p>
+            . '%shttp://getty.org%s', '<a href="http://getty.org" target="_blank">', '</a>'); ?></p>
             <?php echo $this->formSelect('suggest_endpoint', null, array('id' => 'suggest-endpoint'), $this->form_suggest_options); ?>
         </div>
     </div>
 </section>
 <section class="three columns omega">
     <div id="edit" class="panel">
-        <?php echo $this->formSubmit('edit-element-suggest', __('Edit Suggest'), array('class' => 'submit big green button')); ?>
+        <?php echo $this->formSubmit('add-element-suggest', __('Add Suggest'), array('class' => 'submit big green button')); ?>
     </div>
 </section>
 </form>
@@ -57,6 +57,7 @@ jQuery(document).ready(function() {
             <th><?php echo __('Element Set'); ?></th>
             <th><?php echo __('Element'); ?></th>
             <th><?php echo __('Authority/Vocabulary'); ?></th>
+            <th style="width:10%;"></th>
         </tr>
         </thead>
         <tbody>
@@ -65,6 +66,7 @@ jQuery(document).ready(function() {
             <td><?php echo $assignment['element_set_name']; ?></td>
             <td><?php echo $assignment['element_name']; ?></td>
             <td><?php echo $assignment['authority_vocabulary']; ?></td>
+            <td><a href="<?php echo url('getty-suggest/suggest/delete/element_id/'.$assignment['element_id']); ?>"><button style="margin:0px;">Delete</button></a></td>
         </tr>
         <?php endforeach; ?>
         </tbody>
@@ -74,7 +76,7 @@ jQuery(document).ready(function() {
     <?php endif; ?>
 </section>
 <script>
-    jQuery('#suggest-endpoint option[value="tgn"]').attr('disabled','disabled');
+//jQuery('#suggest-endpoint option[value="tgn"]').attr('disabled','disabled');
     jQuery('#suggest-endpoint option[value="ulan"]').attr('disabled','disabled');
     jQuery('#suggest-endpoint option[value="cona"]').attr('disabled','disabled');
 </script>

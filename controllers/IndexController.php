@@ -27,76 +27,6 @@ class GettySuggest_IndexController extends Omeka_Controller_AbstractActionContro
         $this->view->assignments = $this->_getAssignments();
     }
 
-
-     /**
-     * Endpoint for editing a connection between an element and a vocabulary
-     *
-     * @return void
-     */
-    public function editElementSuggestAction()
-    {
-        $elementId = $this->getRequest()->getParam('element_id');
-        $suggestEndpoint = $this->getRequest()->getParam('suggest_endpoint');
-        
-        // Don't process empty select options.
-        if ('' == $elementId) {
-            $this->_helper->redirector('index');
-        }
-        
-        $lcSuggest = $this->_helper->db->getTable('GettySuggest')->findByElementId($elementId);
-        
-        // Handle an existing suggest record.
-        if ($gettySuggest) {
-            
-            // Delete suggest record if there is no endpoint.
-            if ('' == $suggestEndpoint) {
-                $gettySuggest->delete();
-                $this->_helper->flashMessenger(__('Successfully disabled the element\'s suggest feature.'), 'success');
-                $this->_helper->redirector('index');
-            }
-            
-            // Don't process an invalid suggest endpoint.
-            if (!$this->_suggestEndpointExists($suggestEndpoint)) {
-                $this->_helper->flashMessenger(__('Invalid suggest endpoint. No changes have been made.'), 'error');
-                $this->_helper->redirector('index');
-            }
-            
-            $gettySuggest->suggest_endpoint = $suggestEndpoint;
-            $this->_helper->flashMessenger(__('Successfully edited the element\'s suggest feature.'), 'success');
-        
-        // Handle a new suggest record.
-        } else {
-            
-            // Don't process an invalid suggest endpoint.
-            if (!$this->_suggestEndpointExists($suggestEndpoint)) {
-                $this->_helper->flashMessenger(__('Invalid suggest endpoint. No changes have been made.'), 'error');
-                $this->_helper->redirector('index');
-            }
-            
-            $gettySuggest = new GettySuggest;
-            $gettySuggest->element_id = $elementId;
-            $gettySuggest->suggest_endpoint = $suggestEndpoint;
-            $this->_helper->flashMessenger(__('Successfully enabled the element\'s suggest feature.'), 'success');
-        }
-        
-        $gettySuggest->save();
-        $this->_helper->redirector('index');
-    }
-    
-    /**
-     * Outputs the suggest endpoint URL of the specified element or NULL if 
-     * there is none.
-     *
-     * @return void
-     */
-    public function suggestEndpointAction()
-    {
-        $this->_helper->viewRenderer->setNoRender();
-        $elementId = $this->getRequest()->getParam('element_id');
-        $gettySuggest = $this->_helper->db->getTable('GettySuggest')->findByElementId($elementId);
-        echo $gettySuggest->suggest_endpoint;
-    }
-    
     /**
      * Proxy for the Getty Suggest suggest endpoints, used by the 
      * autosuggest feature.
@@ -131,21 +61,6 @@ class GettySuggest_IndexController extends Omeka_Controller_AbstractActionContro
 	}
 	
         $this->_helper->json($results);
-    }
-    
-    /**
-     * Check if the specified suggest endpoint exists.
-     * 
-     * @param string $suggestEndpoint An endpoint url which may or may not exist in the database
-     * @return bool True if the endpoint exists, false otherwise
-     */
-    private function _suggestEndpointExists($suggestEndpoint)
-    {
-        $suggestEndpoints = $this->_helper->db->getTable('GettySuggest')->getSuggestEndpoints();
-        if (!array_key_exists($suggestEndpoint, $suggestEndpoints)) {
-            return false;
-        }
-        return true;
     }
     
     /**
@@ -218,9 +133,13 @@ class GettySuggest_IndexController extends Omeka_Controller_AbstractActionContro
             $element = $elementTable->find($gettySuggest->element_id);
             $elementSet = $elementSetTable->find($element->element_set_id);
             $authorityVocabulary = $suggestEndpoints[$gettySuggest->suggest_endpoint];
-            $assignments[] = array('element_set_name' => __($elementSet->name), 
-                                   'element_name' => __($element->name), 
-                                   'authority_vocabulary' => __($authorityVocabulary));
+            $assignments[] = array(
+                'element_set_name' => __($elementSet->name), 
+                'element_name' => __($element->name), 
+                'authority_vocabulary' => __($authorityVocabulary),
+                'element_id' => $gettySuggest->element_id
+            );
+            
         }
         return $assignments;
     }
