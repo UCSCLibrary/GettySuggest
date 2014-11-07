@@ -89,12 +89,11 @@ jQuery(document).ready(function() {
 	if(gvflag) {
             if(jQuery(this).attr("id")==gvflag) {
                 var element_id = jQuery('#edit-element-id').val();
-                var vocab_id = jQuery('#edit-suggest-id').val();
+                var vocab_id = jQuery('#edit-vocab-id').val();
                 var form = jQuery("<form action='<?php echo url('getty-suggest/suggest/edit/suggest_id/');  ?>"+gvflag+"'></form>");
                 form.append('<input type="hidden" name="element_id" value="'
 +element_id+'" />');
                 form.append('<input type="hidden" name="suggest_endpoint" value="'+vocab_id+'" />');
-                console.log(form);
                 form.appendTo(jQuery('body'));
                 form.submit();
             } else {
@@ -103,7 +102,7 @@ jQuery(document).ready(function() {
 	    //prepare and submit form with params from boxes created below
 	}else{
             var form_element_options = <?php echo json_encode($this->formSelect('element_id', null, array('id' => 'edit-element-id'), $this->form_element_options)); ?>;
-            var suggest_options = <?php echo json_encode($this->formSelect('element_id', null, array('id' => 'edit-suggest-id'), $this->form_suggest_options)); ?>;
+            var suggest_options = <?php echo json_encode($this->formSelect('vocab_id', null, array('id' => 'edit-vocab-id'), $this->form_suggest_options)); ?>;
 	    jQuery(this).parent().parent().children('.element_set_name').html(form_element_options);
 	    jQuery(this).parent().parent().children('.element_name').html('');
 	    jQuery(this).parent().parent().children('.authority_vocabulary').html(suggest_options);
@@ -116,6 +115,8 @@ jQuery(document).ready(function() {
             jQuery("#edit-element-id").css('max-width','250px');
 	    gvflag=jQuery(this).attr("id");
             }
+        jQuery('#edit-vocab-id option[value="ulan"]').attr('disabled','disabled');
+        jQuery('#edit-vocab-id option[value="cona"]').attr('disabled','disabled');
       });
     });
     

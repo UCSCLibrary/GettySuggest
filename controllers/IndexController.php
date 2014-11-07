@@ -126,18 +126,27 @@ class GettySuggest_IndexController extends Omeka_Controller_AbstractActionContro
         $gettySuggestTable = $this->_helper->db->getTable('GettySuggest');
         $elementTable = $this->_helper->db->getTable('Element');
         $elementSetTable = $this->_helper->db->getTable('ElementSet');
+        $itemTypeTable = $this->_helper->db->getTable('ItemType');
+        $itemTypesElementsTable = $this->_helper->db->getTable('ItemTypesElements');
         
         $suggestEndpoints = $gettySuggestTable->getSuggestEndpoints();
         $assignments = array();
         foreach ($gettySuggestTable->findAll() as $gettySuggest) {
             $element = $elementTable->find($gettySuggest->element_id);
             $elementSet = $elementSetTable->find($element->element_set_id);
+            $elementSetName = $elementSet->name;
+            if( $itemTypesElements = $itemTypesElementsTable->findByElement($element->id)) {
+                $itemTypesElement = $itemTypesElements[0];
+                $itemType = $itemTypeTable->find($itemTypesElement->item_type_id);
+                $elementSetName.=': '.$itemType->name;
+            }
+
             $authorityVocabulary = $suggestEndpoints[$gettySuggest->suggest_endpoint];
             $assignments[] = array(
                 'suggest_id' => $gettySuggest->id,
-                'element_set_name' => __($elementSet->name), 
-                'element_name' => __($element->name), 
-                'authority_vocabulary' => __($authorityVocabulary),
+                'element_set_name' => $elementSetName, 
+                'element_name' => $element->name, 
+                'authority_vocabulary' => $authorityVocabulary,
                 'element_id' => $gettySuggest->element_id
             );
             
