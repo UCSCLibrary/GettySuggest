@@ -27,25 +27,27 @@ class GettySuggest_EndpointController extends Omeka_Controller_AbstractActionCon
 
         // Get the suggest record.
         $elementId = $this->getRequest()->getParam('element-id');
-        $gettySuggest = $this->_helper->db->getTable('GettySuggest')->findByElementId($elementId);
+        $gettySuggests = $this->_helper->db->getTable('GettySuggest')->findByElementId($elementId);
 
-	//create the SPARQL query
-	$query = $this->_getSparql($gettySuggest['suggest_endpoint'],$term,'en');
+        $results = array();
+        foreach($gettySuggests as $gettySuggest) {
+            //create the SPARQL query
+            $query = $this->_getSparql($gettySuggest['suggest_endpoint'],$term,'en');
 
-	$fullurl = 'http://vocab.getty.edu/sparql.json?query='.urlencode($query);
+            $fullurl = 'http://vocab.getty.edu/sparql.json?query='.urlencode($query);
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL,$fullurl );
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        $response = curl_exec($ch);
-        curl_close($ch);  
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL,$fullurl );
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            $response = curl_exec($ch);
+            curl_close($ch);  
 
-        $json = json_decode($response);
+            $json = json_decode($response);
 
-	$results = array();
-	foreach($json->results->bindings as $result) {
-	  $results[] = $result->prefLabel->value;
-	}
+            foreach($json->results->bindings as $result) {
+                $results[] = $result->prefLabel->value;
+            }
+        }
 	
         $this->_helper->json($results);
     }
@@ -60,19 +62,33 @@ class GettySuggest_EndpointController extends Omeka_Controller_AbstractActionCon
      * @return string
      */
     private function _getSparql($vocab, $term, $language)  {
-return('select ?prefLabel where '.
-       '{?concept a gvp:Concept . '.
-       '?concept skos:inScheme '.$vocab.': . '.
-       '?concept skos:prefLabel ?prefLabel . '.
-       '?concept ?b ?label . '.
-       'FILTER (?b= skos:prefLabel || ?b= skos:altLabel) . '.
-       'FILTER (lang(?label) = "'.$language.'") . '.
-       'FILTER (lang(?prefLabel) = "'.$language.'") . '.
-       'FILTER (regex(?label,"^'.$term.'","i") '.
-       ') } '.
-       'order by $prefLabel '.
-       'LIMIT 20'
-       );
+        $limit = get_option('gettyLimit');
+        switch($vocab) {
+        case('aat') :
+            return('select ?prefLabel where '.
+            '{?concept a gvp:Concept . '.
+            '?concept skos:inScheme '.$vocab.': . '.
+            '?concept skos:prefLabel ?prefLabel . '.
+            '?concept ?b ?label . '.
+            'FILTER (?b= skos:prefLabel || ?b= skos:altLabel) . '.
+            'FILTER (lang(?label) = "'.$language.'") . '.
+            'FILTER (lang(?prefLabel) = "'.$language.'") . '.
+            'FILTER (regex(?label,"^'.$term.'","i") '.
+            ') } '.
+            'order by $prefLabel '.
+            'LIMIT '.$limit
+            );
+          
+        case('tgn') :
+            return(
+                'select distinct ?prefLabel'.
+                '{?place skos:inScheme tgn: ; '.
+                'gvp:prefLabelGVP [xl:literalForm ?prefLabel]; '.
+                'FILTER regex(?prefLabel,"^'.$term.'","i")} '.
+                'LIMIT '.$limit
+            );
+            break;
+        }
     }
 
 }

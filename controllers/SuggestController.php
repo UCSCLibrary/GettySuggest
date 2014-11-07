@@ -16,14 +16,34 @@ class GettySuggest_SuggestController extends Omeka_Controller_AbstractActionCont
 
     public function deleteAction()
     {   
-        $elementId = $this->getRequest()->getParam('element_id');
-        $gettySuggest = $this->_helper->db->getTable('GettySuggest')->findByElementId($elementId);
+        $suggestId = $this->getRequest()->getParam('suggest_id');
+        $gettySuggest = $this->_helper->db->getTable('GettySuggest')->find($suggestId);
         $gettySuggest->delete();
         $this->_helper->flashMessenger(__('Successfully disabled the element\'s suggest feature.'), 'success');
         $this->_helper->redirector('index','index');
 
     }
 
+    public function editAction()
+    {   
+        $suggestId = $this->getRequest()->getParam('suggest_id');
+        $elementId = $this->getRequest()->getParam('element_id');
+        $suggestEndpoint = $this->getRequest()->getParam('suggest_endpoint');
+
+        // Don't process an invalid suggest endpoint.
+        if (!$this->_suggestEndpointExists($suggestEndpoint)) {
+            $this->_helper->flashMessenger(__('Invalid suggest endpoint. No changes have been made.'), 'error');
+               
+            $this->_helper->redirector('index','index');
+        }
+        
+        $gettySuggest = $this->_helper->db->getTable('GettySuggest')->find($suggestId);
+        $gettySuggest->element_id = $elementId;
+        $gettySuggest->suggest_endpoint = $suggestEndpoint;
+        $gettySuggest->save();
+        $this->_helper->flashMessenger(__('Successfully edited the element\'s suggest feature.'), 'success');
+        $this->_helper->redirector('index','index');
+    }
 
      /**
      * Adds a connection between an element and a vocabulary
@@ -38,9 +58,11 @@ class GettySuggest_SuggestController extends Omeka_Controller_AbstractActionCont
         $suggestEndpoint = $this->getRequest()->getParam('suggest_endpoint');
         
         // Don't process empty select options.
-        if ('' == $elementId) 
+        if ('' == $elementId) {
+                $this->_helper->flashMessenger(__('Please select an element to assign'), 'success');
             $this->_helper->redirector('index','index');
-        
+        }
+        /*
         $gettySuggest = $this->_helper->db->getTable('GettySuggest')->findByElementId($elementId);
         
         // Handle an existing suggest record.
@@ -65,7 +87,7 @@ class GettySuggest_SuggestController extends Omeka_Controller_AbstractActionCont
         
         // Handle a new suggest record.
         } else {
-            
+        */
             // Don't process an invalid suggest endpoint.
             if (!$this->_suggestEndpointExists($suggestEndpoint)) {
                 $this->_helper->flashMessenger(__('Invalid suggest endpoint. No changes have been made.'), 'error');
@@ -77,7 +99,7 @@ class GettySuggest_SuggestController extends Omeka_Controller_AbstractActionCont
             $gettySuggest->element_id = $elementId;
             $gettySuggest->suggest_endpoint = $suggestEndpoint;
             $this->_helper->flashMessenger(__('Successfully enabled the element\'s suggest feature.'), 'success');
-        }
+            //      }
         
         $gettySuggest->save();
 

@@ -22,6 +22,9 @@ class GettySuggestPlugin extends Omeka_Plugin_AbstractPlugin
         'uninstall', 
         'initialize', 
         'define_acl', 
+        'admin_head',
+        'config',
+        'config_form'
     );
     
     /**
@@ -29,6 +32,10 @@ class GettySuggestPlugin extends Omeka_Plugin_AbstractPlugin
      */
     protected $_filters = array(
         'admin_navigation_main', 
+    );
+
+    protected $_options = array(
+        'gettyLimit'=>'20'
     );
     
     /**
@@ -38,13 +45,13 @@ class GettySuggestPlugin extends Omeka_Plugin_AbstractPlugin
      */
     public function hookInstall()
     {
+        $this->_installOptions();
         $sql1 = "
         CREATE TABLE `{$this->_db->GettySuggest}` (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
             `element_id` int(10) unsigned NOT NULL,
             `suggest_endpoint` tinytext COLLATE utf8_unicode_ci NOT NULL,
-            PRIMARY KEY (`id`),
-            UNIQUE KEY `element_id` (`element_id`)
+            PRIMARY KEY (`id`)
         ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
         $this->_db->query($sql1);
     }
@@ -56,6 +63,7 @@ class GettySuggestPlugin extends Omeka_Plugin_AbstractPlugin
      */
     public function hookUninstall()
     {
+        $this->_uninstallOptions();
         $sql1 = "DROP TABLE IF EXISTS `{$this->_db->GettySuggest}`";
         $this->_db->query($sql1);
     }
@@ -102,5 +110,38 @@ class GettySuggestPlugin extends Omeka_Plugin_AbstractPlugin
             'privilege' => 'index', 
         );
         return $nav;
+    }
+
+    public function markSuggestField($components, $args) {
+        $components['description'] = $components['description']." (This element has autosuggest activated using the GettySuggest plugin)";
+        return($components);
+    }
+
+    public function hookAdminHead() {
+        $suggests = get_db()->getTable('GettySuggest')->findAll();
+        foreach($suggests as $suggest) {
+            $element = get_db()->getTable('Element')->find($suggest->element_id);
+            add_filter(array('ElementForm', 'Item', $element->getElementSet()->name, $element->name),array($this,'markSuggestField'));
+        }
+    }
+
+    public function hookConfig() {
+        set_option('gettyLimit',$_REQUEST['getty-limit']);
+    }
+
+    public function hookConfigForm() {
+        ?>
+<div class="field">
+    <div id="getty-limit-label" class="two columns alpha">
+        <label for="getty-limit"><?php echo 'Maximum number of terms to return for each Getty vocabulary autosuggest'; ?></label>
+    </div>
+    <div class="inputs five columns omega">
+<?php echo get_view()->formText('getty-limit',get_option('getty-limit'),array()); ?>
+        <p class="explanation"><?php echo __('Higher numbers will give you more options for each term, but will also slow down the response time.'); ?></p>
+    </div>
+</div>
+
+
+<?php
     }
 }

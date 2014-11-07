@@ -134,6 +134,7 @@ class GettySuggest_IndexController extends Omeka_Controller_AbstractActionContro
             $elementSet = $elementSetTable->find($element->element_set_id);
             $authorityVocabulary = $suggestEndpoints[$gettySuggest->suggest_endpoint];
             $assignments[] = array(
+                'suggest_id' => $gettySuggest->id,
                 'element_set_name' => __($elementSet->name), 
                 'element_name' => __($element->name), 
                 'authority_vocabulary' => __($authorityVocabulary),
