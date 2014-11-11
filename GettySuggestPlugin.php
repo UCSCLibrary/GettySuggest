@@ -35,7 +35,7 @@ class GettySuggestPlugin extends Omeka_Plugin_AbstractPlugin
     );
 
     protected $_options = array(
-        'gettyLimit'=>'20'
+        'gettyLimit'=>'10'
     );
     
     /**
@@ -136,7 +136,7 @@ class GettySuggestPlugin extends Omeka_Plugin_AbstractPlugin
         <label for="getty-limit"><?php echo 'Maximum number of terms to return for each Getty vocabulary autosuggest'; ?></label>
     </div>
     <div class="inputs five columns omega">
-<?php echo get_view()->formText('getty-limit',get_option('getty-limit'),array()); ?>
+<?php echo get_view()->formText('getty-limit',get_option('gettyLimit'),array()); ?>
         <p class="explanation"><?php echo __('Higher numbers will give you more options for each term, but will also slow down the response time.'); ?></p>
     </div>
 </div>
