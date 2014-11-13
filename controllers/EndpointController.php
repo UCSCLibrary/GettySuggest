@@ -35,14 +35,16 @@ class GettySuggest_EndpointController extends Omeka_Controller_AbstractActionCon
             $query = $this->_getSparql($gettySuggest['suggest_endpoint'],$term,'en');
 
             $fullurl = 'http://vocab.getty.edu/sparql.json?query='.urlencode($query);
-            /*
+            //$fullurl = 'http://vocab.getty.edu/sparql.json?query='.$query;
+            
+            
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL,$fullurl );
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             $response = curl_exec($ch);
             curl_close($ch);  
-            */
-            $response = $this->_stream_download($fullurl);
+            
+            //$response = $this->_stream_download($fullurl);
             $json = json_decode($response);
 
             foreach($json->results->bindings as $result) {
@@ -61,7 +63,9 @@ class GettySuggest_EndpointController extends Omeka_Controller_AbstractActionCon
             )
         );
         $context = stream_context_create($context_options);
-        $contents = file_get_contents($Url,NULL,$context);
+        //$contents = file_get_contents($Url,NULL,$context);
+        //die($Url);
+        $contents = file_get_contents($Url);
         return $contents;
     }
 
