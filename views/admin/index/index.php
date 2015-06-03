@@ -51,6 +51,7 @@ jQuery(document).ready(function() {
         ); ?>
     </div>
 </section>
+ <?php echo $$this->csrf; ?>
 </form>
 <section class="ten columns alpha">
     <h2><?php echo __('Current Assignments'); ?></h2>
@@ -94,6 +95,7 @@ jQuery(document).ready(function() {
                 form.append('<input type="hidden" name="element_id" value="'
 +element_id+'" />');
                 form.append('<input type="hidden" name="suggest_endpoint" value="'+vocab_id+'" />');
+		form.append('<?php echo $this->csrf;?>');
                 form.appendTo(jQuery('body'));
                 form.submit();
             } else {

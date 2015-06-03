@@ -16,6 +16,7 @@ class GettySuggest_SuggestController extends Omeka_Controller_AbstractActionCont
 
     public function deleteAction()
     {   
+      $this->_validatePost();
         $suggestId = $this->getRequest()->getParam('suggest_id');
         $gettySuggest = $this->_helper->db->getTable('GettySuggest')->find($suggestId);
         $gettySuggest->delete();
@@ -26,9 +27,10 @@ class GettySuggest_SuggestController extends Omeka_Controller_AbstractActionCont
 
     public function editAction()
     {   
-        $suggestId = $this->getRequest()->getParam('suggest_id');
-        $elementId = $this->getRequest()->getParam('element_id');
-        $suggestEndpoint = $this->getRequest()->getParam('suggest_endpoint');
+      $this->_validatePost();
+      $suggestId = $this->getRequest()->getParam('suggest_id');
+      $elementId = $this->getRequest()->getParam('element_id');
+      $suggestEndpoint = $this->getRequest()->getParam('suggest_endpoint');
 
         // Don't process an invalid suggest endpoint.
         if (!$this->_suggestEndpointExists($suggestEndpoint)) {
@@ -54,56 +56,31 @@ class GettySuggest_SuggestController extends Omeka_Controller_AbstractActionCont
      */
     public function addAction()
     {
-        $elementId = $this->getRequest()->getParam('element_id');
-        $suggestEndpoint = $this->getRequest()->getParam('suggest_endpoint');
+      $this->_validatePost();
+      $elementId = $this->getRequest()->getParam('element_id');
+      $suggestEndpoint = $this->getRequest()->getParam('suggest_endpoint');
+      
+      // Don't process empty select options.
+      if ('' == $elementId) {
+	$this->_helper->flashMessenger(__('Please select an element to assign'), 'success');
+	$this->_helper->redirector('index','index');
+      }
+      
+      if (!$this->_suggestEndpointExists($suggestEndpoint)) {
+	$this->_helper->flashMessenger(__('Invalid suggest endpoint. No changes have been made.'), 'error');
         
-        // Don't process empty select options.
-        if ('' == $elementId) {
-                $this->_helper->flashMessenger(__('Please select an element to assign'), 'success');
-            $this->_helper->redirector('index','index');
-        }
-        /*
-        $gettySuggest = $this->_helper->db->getTable('GettySuggest')->findByElementId($elementId);
-        
-        // Handle an existing suggest record.
-        if ($gettySuggest) {
-            
-            // Delete suggest record if there is no endpoint.
-            if ('' == $suggestEndpoint) {
-                $gettySuggest->delete();
-                $this->_helper->flashMessenger(__('Successfully disabled the element\'s suggest feature.'), 'success');
-                $this->_helper->redirector('index');
-            }
-            
-            // Don't process an invalid suggest endpoint.
-            if (!$this->_suggestEndpointExists($suggestEndpoint)) {
-                $this->_helper->flashMessenger(__('Invalid suggest endpoint. No changes have been made.'), 'error');
-               
-                $this->_helper->redirector('index','index');
-            }
-            
-            $gettySuggest->suggest_endpoint = $suggestEndpoint;
-            $this->_helper->flashMessenger(__('Successfully edited the element\'s suggest feature.'), 'success');
-        
-        // Handle a new suggest record.
-        } else {
-        */
-            // Don't process an invalid suggest endpoint.
-            if (!$this->_suggestEndpointExists($suggestEndpoint)) {
-                $this->_helper->flashMessenger(__('Invalid suggest endpoint. No changes have been made.'), 'error');
-               
-                $this->_helper->redirector('index','index');
-            }
-            
-            $gettySuggest = new GettySuggest;
-            $gettySuggest->element_id = $elementId;
-            $gettySuggest->suggest_endpoint = $suggestEndpoint;
-            $this->_helper->flashMessenger(__('Successfully enabled the element\'s suggest feature.'), 'success');
-            //      }
-        
-        $gettySuggest->save();
-
-        $this->_helper->redirector('index','index');
+	$this->_helper->redirector('index','index');
+      }
+      
+      $gettySuggest = new GettySuggest;
+      $gettySuggest->element_id = $elementId;
+      $gettySuggest->suggest_endpoint = $suggestEndpoint;
+      $this->_helper->flashMessenger(__('Successfully enabled the element\'s suggest feature.'), 'success');
+      //      }
+      
+      $gettySuggest->save();
+	
+      $this->_helper->redirector('index','index');
     }
 
 
@@ -123,7 +100,14 @@ class GettySuggest_SuggestController extends Omeka_Controller_AbstractActionCont
         return true;
     }
     
-
+   
+    private function _validatePost(){
+      $csrf = new Omeka_Form_SessionCsrf;
+      if(!$csrf->isValid($_POST))
+	die("ERROR!");
+      return true;
+    }
+}
 
 
 }
