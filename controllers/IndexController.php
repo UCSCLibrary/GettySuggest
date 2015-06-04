@@ -22,8 +22,8 @@ class GettySuggest_IndexController extends Omeka_Controller_AbstractActionContro
    */
   public function indexAction()
   {
-    $csrf = new OMeka_Form_SessionCsrf;
-    $this->view->csrf = $csrf;
+      $this->view->csrf = (version_compare(OMEKA_VERSION,'2.2.1') >= 0) ? new Omeka_Form_SessionCsrf : '';
+
     $this->view->form_element_options = $this->_getFormElementOptions();
     $this->view->form_suggest_options = $this->_getFormSuggestOptions();
     $this->view->assignments = $this->_getAssignments();

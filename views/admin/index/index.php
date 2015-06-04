@@ -51,7 +51,7 @@ jQuery(document).ready(function() {
         ); ?>
     </div>
 </section>
- <?php echo $$this->csrf; ?>
+ <?php echo $this->csrf; ?>
 </form>
 <section class="ten columns alpha">
     <h2><?php echo __('Current Assignments'); ?></h2>

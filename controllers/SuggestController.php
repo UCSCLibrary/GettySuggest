@@ -16,7 +16,8 @@ class GettySuggest_SuggestController extends Omeka_Controller_AbstractActionCont
 
     public function deleteAction()
     {   
-      $this->_validatePost();
+        if(version_compare(OMEKA_VERSION,'2.2.1') >= 0)
+            $this->_validatePost();
         $suggestId = $this->getRequest()->getParam('suggest_id');
         $gettySuggest = $this->_helper->db->getTable('GettySuggest')->find($suggestId);
         $gettySuggest->delete();
