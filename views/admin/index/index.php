@@ -71,7 +71,16 @@ jQuery(document).ready(function() {
             <td class="element_set_name"><?php echo $assignment['element_set_name']; ?></td>
             <td class="element_name"><?php echo $assignment['element_name']; ?></td>
             <td class="authority_vocabulary"><?php echo $assignment['authority_vocabulary']; ?></td>
-            <td><button id="<?php echo $assignment['suggest_id'];?>" class="gv-edit-suggest-button" style="margin:0px 5px 0px 0px;">Edit</button><a href="<?php echo url('getty-suggest/suggest/delete/suggest_id/'.$assignment['suggest_id']); ?>"><button style="margin:0px;">Delete</button></a></td>
+            <td><button id="<?php echo $assignment['suggest_id'];?>" class="gv-edit-suggest-button" style="margin:0px 5px 0px 0px;">Edit</button>
+
+<form style="display:inline;" method="post" action="<?php echo url('getty-suggest/suggest/delete/suggest_id/'.$assignment['suggest_id']); ?>">
+<?php echo $this->csrf;?>
+<button type='submit' style="margin:0px;">
+     Delete
+</button>
+</form>
+</td>
+
         </tr>
         <?php endforeach; ?>
         </tbody>
@@ -84,43 +93,44 @@ jQuery(document).ready(function() {
 //jQuery('#suggest-endpoint option[value="tgn"]').attr('disabled','disabled');
     jQuery('#suggest-endpoint option[value="ulan"]').attr('disabled','disabled');
     jQuery('#suggest-endpoint option[value="cona"]').attr('disabled','disabled');
-    jQuery(document).ready(function() {
-      var gvflag=false;
-      jQuery('.gv-edit-suggest-button').click(function(e){
-	if(gvflag) {
+jQuery(document).ready(function() {
+    var gvflag=false;
+    jQuery('.gv-edit-suggest-button').click(function(e){
+        if(gvflag) {
             if(jQuery(this).attr("id")==gvflag) {
                 var element_id = jQuery('#edit-element-id').val();
                 var vocab_id = jQuery('#edit-vocab-id').val();
-                var form = jQuery("<form action='<?php echo url('getty-suggest/suggest/edit/suggest_id/');  ?>"+gvflag+"'></form>");
+                var form = jQuery("<form method='post' action='<?php echo url('getty-suggest/suggest/edit/suggest_id/');  ?>"+gvflag+"'></form>");
                 form.append('<input type="hidden" name="element_id" value="'
 +element_id+'" />');
                 form.append('<input type="hidden" name="suggest_endpoint" value="'+vocab_id+'" />');
-		form.append('<?php echo $this->csrf;?>');
+                form.append('<?php echo trim($this->csrf);?>');
                 form.appendTo(jQuery('body'));
                 form.submit();
             } else {
                 alert('Please edit one suggest assignment at a time');
             }
-	    //prepare and submit form with params from boxes created below
-	}else{
+            //prepare and submit form with params from boxes created below
+        }else{
             var form_element_options = <?php echo json_encode($this->formSelect('element_id', null, array('id' => 'edit-element-id'), $this->form_element_options)); ?>;
             var suggest_options = <?php echo json_encode($this->formSelect('vocab_id', null, array('id' => 'edit-vocab-id'), $this->form_suggest_options)); ?>;
-	    jQuery(this).parent().parent().children('.element_set_name').html(form_element_options);
-	    jQuery(this).parent().parent().children('.element_name').html('');
-	    jQuery(this).parent().parent().children('.authority_vocabulary').html(suggest_options);
+            jQuery(this).parent().parent().children('.element_set_name').html(form_element_options);
+            jQuery(this).parent().parent().children('.element_name').html('');
+            jQuery(this).parent().parent().children('.authority_vocabulary').html(suggest_options);
             jQuery(this).html("Save");
-
+            jQuery(this).css('float','left');
+            
             jQuery('#edit-suggest-id option[value="ulan"]').attr('disabled','disabled');
             jQuery('#edit-suggest-id option[value="cona"]').attr('disabled','disabled');
-
+            
 
             jQuery("#edit-element-id").css('max-width','250px');
-	    gvflag=jQuery(this).attr("id");
-            }
+            gvflag=jQuery(this).attr("id");
+        }
         jQuery('#edit-vocab-id option[value="ulan"]').attr('disabled','disabled');
         jQuery('#edit-vocab-id option[value="cona"]').attr('disabled','disabled');
-      });
     });
+});
     
 </script>
 <?php 

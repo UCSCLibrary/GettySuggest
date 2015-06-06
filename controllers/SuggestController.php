@@ -105,10 +105,9 @@ class GettySuggest_SuggestController extends Omeka_Controller_AbstractActionCont
     private function _validatePost(){
       $csrf = new Omeka_Form_SessionCsrf;
       if(!$csrf->isValid($_POST))
-	die("ERROR!");
+          die("ERROR!");
       return true;
     }
 }
 
 
-}
