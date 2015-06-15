@@ -22,8 +22,6 @@ class GettySuggest_EndpointController extends Omeka_Controller_AbstractActionCon
      */
     public function proxyAction()
     {
-        die($this->_getSparql('tgn','cap','en'));
-
       //get the term
       $term = $this->getRequest()->getParam('term');
 

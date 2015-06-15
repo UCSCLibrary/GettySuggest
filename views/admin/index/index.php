@@ -90,8 +90,6 @@ jQuery(document).ready(function() {
     <?php endif; ?>
 </section>
 <script>
-//jQuery('#suggest-endpoint option[value="tgn"]').attr('disabled','disabled');
-    jQuery('#suggest-endpoint option[value="ulan"]').attr('disabled','disabled');
     jQuery('#suggest-endpoint option[value="cona"]').attr('disabled','disabled');
 jQuery(document).ready(function() {
     var gvflag=false;
@@ -120,21 +118,13 @@ jQuery(document).ready(function() {
             jQuery(this).html("Save");
             jQuery(this).css('float','left');
             
-#            jQuery('#edit-suggest-id option[value="ulan"]').attr('disabled','disabled');
             jQuery('#edit-suggest-id option[value="cona"]').attr('disabled','disabled');
-            
-
             jQuery("#edit-element-id").css('max-width','250px');
             gvflag=jQuery(this).attr("id");
         }
-        jQuery('#edit-vocab-id option[value="ulan"]').attr('disabled','disabled');
         jQuery('#edit-vocab-id option[value="cona"]').attr('disabled','disabled');
     });
 });
     
 </script>
-<?php 
-
-
-
-echo foot(); ?>
+<?php echo foot(); ?>
