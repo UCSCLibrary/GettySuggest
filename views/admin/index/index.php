@@ -120,7 +120,7 @@ jQuery(document).ready(function() {
             jQuery(this).html("Save");
             jQuery(this).css('float','left');
             
-            jQuery('#edit-suggest-id option[value="ulan"]').attr('disabled','disabled');
+#            jQuery('#edit-suggest-id option[value="ulan"]').attr('disabled','disabled');
             jQuery('#edit-suggest-id option[value="cona"]').attr('disabled','disabled');
             
 

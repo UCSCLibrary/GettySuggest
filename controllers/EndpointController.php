@@ -22,6 +22,8 @@ class GettySuggest_EndpointController extends Omeka_Controller_AbstractActionCon
      */
     public function proxyAction()
     {
+        die($this->_getSparql('tgn','cap','en'));
+
       //get the term
       $term = $this->getRequest()->getParam('term');
 
@@ -36,7 +38,6 @@ class GettySuggest_EndpointController extends Omeka_Controller_AbstractActionCon
 
             $fullurl = 'http://vocab.getty.edu/sparql.json?query='.urlencode($query);
             //$fullurl = 'http://vocab.getty.edu/sparql.json?query='.$query;
-            
             
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL,$fullurl );
@@ -74,38 +75,18 @@ class GettySuggest_EndpointController extends Omeka_Controller_AbstractActionCon
      * autocompletions
      * 
      * @param string $vocab The name of the vocabulary to query (e.g.
-     * "tgn", or "aat")
+     * "tgn", "aat", "ulan")
      * @param string $term The first few characters of the term to autosuggest
      * @return string
      */
     private function _getSparql($vocab, $term, $language)  {
-        $limit = get_option('gettyLimit');
-        switch($vocab) {
-        case('aat') :
-            return('select ?prefLabel where '.
-            '{?concept a gvp:Concept . '.
-            '?concept skos:inScheme '.$vocab.': . '.
-            '?concept skos:prefLabel ?prefLabel . '.
-            '?concept ?b ?label . '.
-            'FILTER (?b= skos:prefLabel || ?b= skos:altLabel) . '.
-            'FILTER (lang(?label) = "'.$language.'") . '.
-            'FILTER (lang(?prefLabel) = "'.$language.'") . '.
-            'FILTER (regex(?label,"^'.$term.'","i") '.
-            ') } '.
-            'order by $prefLabel '.
-            'LIMIT '.$limit
-            );
-          
-        case('tgn') :
             return(
                 'select distinct ?prefLabel'.
                 '{?place skos:inScheme tgn: ; '.
                 'gvp:prefLabelGVP [xl:literalForm ?prefLabel]; '.
                 'FILTER regex(?prefLabel,"^'.$term.'","i")} '.
-                'LIMIT '.$limit
+                'LIMIT '.get_option('gettyLimit')
             );
-            break;
-        }
     }
 
 }
