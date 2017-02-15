@@ -28,15 +28,15 @@ class GettySuggest_SuggestController extends Omeka_Controller_AbstractActionCont
 
     public function editAction()
     {   
-      $this->_validatePost();
-      $suggestId = $this->getRequest()->getParam('suggest_id');
-      $elementId = $this->getRequest()->getParam('element_id');
-      $suggestEndpoint = $this->getRequest()->getParam('suggest_endpoint');
+        $this->_validatePost();
+        $suggestId = $this->getRequest()->getParam('suggest_id');
+        $elementId = $this->getRequest()->getParam('element_id');
+        $suggestEndpoint = $this->getRequest()->getParam('suggest_endpoint');
 
         // Don't process an invalid suggest endpoint.
         if (!$this->_suggestEndpointExists($suggestEndpoint)) {
             $this->_helper->flashMessenger(__('Invalid suggest endpoint. No changes have been made.'), 'error');
-               
+            
             $this->_helper->redirector('index','index');
         }
         
@@ -45,10 +45,12 @@ class GettySuggest_SuggestController extends Omeka_Controller_AbstractActionCont
         $gettySuggest->suggest_endpoint = $suggestEndpoint;
         $gettySuggest->save();
         $this->_helper->flashMessenger(__('Successfully edited the element\'s suggest feature.'), 'success');
+        if($gettySuggest->suggest_endpoint == "tgn")
+            $this->_helper->flashMessenger(__('Warning: the suggest feature for the Thesaurus of Geographic Names is currently very slow. It often takes many seconds for autosuggest results to appear. The other vocabularies are faster.'), 'error');
         $this->_helper->redirector('index','index');
     }
 
-     /**
+    /**
      * Adds a connection between an element and a vocabulary
      *
      * Overwrites existing connection for that element, if one exists
@@ -57,31 +59,31 @@ class GettySuggest_SuggestController extends Omeka_Controller_AbstractActionCont
      */
     public function addAction()
     {
-      $this->_validatePost();
-      $elementId = $this->getRequest()->getParam('element_id');
-      $suggestEndpoint = $this->getRequest()->getParam('suggest_endpoint');
-      
-      // Don't process empty select options.
-      if ('' == $elementId) {
-	$this->_helper->flashMessenger(__('Please select an element to assign'), 'success');
-	$this->_helper->redirector('index','index');
-      }
-      
-      if (!$this->_suggestEndpointExists($suggestEndpoint)) {
-	$this->_helper->flashMessenger(__('Invalid suggest endpoint. No changes have been made.'), 'error');
+        $this->_validatePost();
+        $elementId = $this->getRequest()->getParam('element_id');
+        $suggestEndpoint = $this->getRequest()->getParam('suggest_endpoint');
         
-	$this->_helper->redirector('index','index');
-      }
-      
-      $gettySuggest = new GettySuggest;
-      $gettySuggest->element_id = $elementId;
-      $gettySuggest->suggest_endpoint = $suggestEndpoint;
-      $this->_helper->flashMessenger(__('Successfully enabled the element\'s suggest feature.'), 'success');
-      //      }
-      
-      $gettySuggest->save();
-	
-      $this->_helper->redirector('index','index');
+        // Don't process empty select options.
+        if ('' == $elementId) {
+	    $this->_helper->flashMessenger(__('Please select an element to assign'), 'success');
+	    $this->_helper->redirector('index','index');
+        }
+        
+        if (!$this->_suggestEndpointExists($suggestEndpoint)) {
+	    $this->_helper->flashMessenger(__('Invalid suggest endpoint. No changes have been made.'), 'error');
+            
+	    $this->_helper->redirector('index','index');
+        }
+        
+        $gettySuggest = new GettySuggest;
+        $gettySuggest->element_id = $elementId;
+        $gettySuggest->suggest_endpoint = $suggestEndpoint;
+        $this->_helper->flashMessenger(__('Successfully enabled the element\'s suggest feature.'), 'success');
+        if($gettySuggest->suggest_endpoint == "tgn")
+            $this->_helper->flashMessenger(__('Warning: the suggest feature for the Thesaurus of Geographic Names is currently very slow. It often takes many seconds for autosuggest results to appear. The other vocabularies are faster.'), 'error');
+                
+        $gettySuggest->save();	
+        $this->_helper->redirector('index','index');
     }
 
 
@@ -101,12 +103,12 @@ class GettySuggest_SuggestController extends Omeka_Controller_AbstractActionCont
         return true;
     }
     
-   
+    
     private function _validatePost(){
-      $csrf = new Omeka_Form_SessionCsrf;
-      if(!$csrf->isValid($_POST))
-          die("ERROR!");
-      return true;
+        $csrf = new Omeka_Form_SessionCsrf;
+        if(!$csrf->isValid($_POST))
+            die("ERROR!");
+        return true;
     }
 }
 
