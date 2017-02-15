@@ -23,7 +23,7 @@ class Table_GettySuggest extends Omeka_Db_Table
         'aat' => 'Art and Architecture Thesaurus', 
         'tgn' => 'Thesuarus of Geographic Names', 
         'ulan' => 'Union List of Artist Names', 
-        'cona' => 'Cultural Objects Name Authority'
+#        'cona' => 'Cultural Objects Name Authority'
 				       );
     
     /**
