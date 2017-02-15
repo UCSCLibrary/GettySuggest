@@ -22,7 +22,6 @@ class GettySuggest_EndpointController extends Omeka_Controller_AbstractActionCon
      */
     public function proxyAction()
     {
-      //get the term
       $term = $this->getRequest()->getParam('term');
 
         // Get the suggest record.
@@ -33,39 +32,20 @@ class GettySuggest_EndpointController extends Omeka_Controller_AbstractActionCon
         foreach($gettySuggests as $gettySuggest) {
             //create the SPARQL query
             $query = $this->_getSparql($gettySuggest['suggest_endpoint'],$term,'en');
-
             $fullurl = 'http://vocab.getty.edu/sparql.json?query='.urlencode($query);
-            //$fullurl = 'http://vocab.getty.edu/sparql.json?query='.$query;
-            
+
+            //execute the query using CURL
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL,$fullurl );
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             $response = curl_exec($ch);
             curl_close($ch);  
             
-            //$response = $this->_stream_download($fullurl);
             $json = json_decode($response);
-
-            foreach($json->results->bindings as $result) {
+            foreach($json->results->bindings as $result)
                 $results[] = $result->prefLabel->value;
-            }
         }
-	
         $this->_helper->json($results);
-    }
-
-    private function _stream_download($Url) {
-        $context_options = array(
-            'http' => array(
-                'method'=>'GET',
-                'header'=>'Accept-language: en\r\n'
-            )
-        );
-        $context = stream_context_create($context_options);
-        //$contents = file_get_contents($Url,NULL,$context);
-        //die($Url);
-        $contents = file_get_contents($Url);
-        return $contents;
     }
 
     /**
@@ -80,8 +60,8 @@ class GettySuggest_EndpointController extends Omeka_Controller_AbstractActionCon
     private function _getSparql($vocab, $term, $language)  {
             return(
                 'select distinct ?prefLabel'.
-                '{?place skos:inScheme tgn: ; '.
-                'gvp:prefLabelGVP [xl:literalForm ?prefLabel]; '.
+                '{?place skos:inScheme '.$vocab.': ; '.
+                'gvp:prefLabelGVP [xl:literalForm ?prefLabel; dct:language gvp_lang:'.$language.']; '.
                 'FILTER regex(?prefLabel,"^'.$term.'","i")} '.
                 'LIMIT '.get_option('gettyLimit')
             );
