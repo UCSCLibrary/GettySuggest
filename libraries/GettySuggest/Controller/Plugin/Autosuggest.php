@@ -67,7 +67,12 @@ class GettySuggest_Controller_Plugin_Autosuggest extends Zend_Controller_Plugin_
                     jQuery(document).bind('omeka:elementformload', function(event) {
                         jQuery('#element-<?php echo $element->id; ?> textarea').autocomplete({
                           minLength: 3,
-                                source: <?php echo json_encode($view->url('getty-suggest/endpoint/proxy/element-id/' . $element->id)); ?>
+                          delay: 200,
+                          search: function( event, ui ) {
+                              jQuery("#element-<?php echo $element->id; ?> .wait-icon").show()},
+                          response: function( event, ui ) {
+                              jQuery("#element-<?php echo $element->id; ?> .wait-icon").hide()},
+                          source: <?php echo json_encode($view->url('getty-suggest/endpoint/proxy/element-id/' . $element->id)); ?>
                         });
                     });
 <?php

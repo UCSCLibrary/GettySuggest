@@ -1,0 +1,6 @@
+div.wait-icon {
+    display: none;
+    position: absolute;
+    right: 10px;
+    top: initial;
+}

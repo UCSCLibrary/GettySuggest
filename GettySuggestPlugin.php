@@ -113,11 +113,12 @@ class GettySuggestPlugin extends Omeka_Plugin_AbstractPlugin
     }
 
     public function markSuggestField($components, $args) {
-        $components['description'] = $components['description']." (This element has autosuggest activated using the GettySuggest plugin)";
+        $components['description'] = $components['description'].'<p class="gett-suggest-notice">(This element has autosuggest activated using the GettySuggest plugin)</p><div class="wait-icon">Querying...</div>';
         return($components);
     }
 
     public function hookAdminHead() {
+        queue_css_file('GettySuggest');
         $suggests = get_db()->getTable('GettySuggest')->findAll();
         foreach($suggests as $suggest) {
             $element = get_db()->getTable('Element')->find($suggest->element_id);
